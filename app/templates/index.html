@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuantumRisk - Credit Default Prediction</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #a855f7;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            font-weight: 300;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 2rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        @media (max-width: 968px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 12px 40px 0 rgba(6, 182, 212, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 0.75rem;
+            color: var(--accent-cyan);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 600px) {
+            .form-group.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        input, select {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 10px rgba(6, 182, 212, 0.25);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        .readonly-input {
+            background: rgba(15, 23, 42, 0.3);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+        }
+
+        button {
+            margin-top: 2rem;
+            background: linear-gradient(to right, var(--accent-cyan), var(--accent-purple));
+            color: var(--text-primary);
+            border: none;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+            width: 100%;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Results Panel */
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 350px;
+            text-align: center;
+        }
+
+        .placeholder-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            color: var(--text-secondary);
+        }
+
+        .placeholder-state svg {
+            width: 64px;
+            height: 64px;
+            stroke: var(--accent-purple);
+            opacity: 0.7;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        .loading-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .result-state {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            animation: zoomIn 0.5s ease;
+        }
+
+        .risk-badge {
+            font-size: 1.3rem;
+            font-weight: 800;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .risk-low {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--accent-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.1);
+        }
+
+        .risk-high {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--accent-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.1);
+        }
+
+        /* Gauge Meter */
+        .gauge-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin-bottom: 1rem;
+        }
+
+        .gauge-svg {
+            transform: rotate(-90deg);
+            width: 100%;
+            height: 100%;
+        }
+
+        .gauge-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 12;
+        }
+
+        .gauge-bar {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease-out, stroke 1s ease;
+            stroke-dasharray: 565.48; /* 2 * pi * r (r=90) */
+            stroke-dashoffset: 565.48;
+        }
+
+        .gauge-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .probability-value {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .probability-label {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            width: 100%;
+            margin-top: 1.5rem;
+        }
+
+        .metric-card {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 1rem;
+            text-align: left;
+        }
+
+        .metric-card h4 {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-card p {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        footer {
+            margin-top: auto;
+            padding: 2rem 0 1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            text-align: center;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.05); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>QUANTUMRISK</h1>
+        <p>Advanced Machine Learning Credit Risk Analytics Portal</p>
+    </header>
+
+    <div class="container">
+        <!-- Form Panel -->
+        <div class="glass-card">
+            <h2 class="card-title">Customer & Loan Application Parameters</h2>
+            <form id="predictionForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="customer_id">Customer ID</label>
+                        <input type="text" id="customer_id" name="customer_id" placeholder="e.g. CUS_1234" required value="257244">
+                    </div>
+                    <div class="form-group">
+                        <label for="lender_id">Lender ID</label>
+                        <select id="lender_id" name="lender_id" required>
+                            <option value="267278" selected>267278 (Primary Lender)</option>
+                            <option value="267277">267277 (Lender B)</option>
+                            <option value="267279">267279 (Lender C)</option>
+                            <option value="267276">267276 (Lender D)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="loan_type">Loan Type</label>
+                        <select id="loan_type" name="loan_type" required>
+                            <option value="Type_1" selected>Type 1 (Short-term/Personal)</option>
+                            <option value="Type_7">Type 7</option>
+                            <option value="Type_5">Type 5</option>
+                            <option value="Type_4">Type 4</option>
+                            <option value="Type_9">Type 9</option>
+                            <option value="Type_6">Type 6</option>
+                            <option value="Type_2">Type 2</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="New_versus_Repeat">Borrower Profile</label>
+                        <select id="New_versus_Repeat" name="New_versus_Repeat" required>
+                            <option value="Repeat Loan" selected>Repeat Loan (Existing Borrower)</option>
+                            <option value="New Loan">New Loan (First Time Borrower)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="disbursement_date">Disbursement Date</label>
+                        <input type="date" id="disbursement_date" name="disbursement_date" required value="2024-06-01">
+                    </div>
+                    <div class="form-group">
+                        <label for="due_date">Due Date</label>
+                        <input type="date" id="due_date" name="due_date" required value="2024-06-08">
+                    </div>
+                    <div class="form-group">
+                        <label for="duration">Duration (Days)</label>
+                        <input type="number" id="duration" name="duration" class="readonly-input" readonly value="7">
+                    </div>
+                    <div class="form-group">
+                        <label for="Total_Amount">Disbursed Amount (KES)</label>
+                        <input type="number" id="Total_Amount" name="Total_Amount" placeholder="Amount disbursed" required value="10000" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="Total_Amount_to_Repay">Expected Repayment (KES)</label>
+                        <input type="number" id="Total_Amount_to_Repay" name="Total_Amount_to_Repay" placeholder="Total repayment value" required value="11000" min="1">
+                    </div>
+                    <div class="form-group">
+                        <label for="Amount_Funded_By_Lender">Amount Funded By Lender (KES)</label>
+                        <input type="number" id="Amount_Funded_By_Lender" name="Amount_Funded_By_Lender" placeholder="Lender funding share" required value="5000" min="0">
+                    </div>
+                    <div class="form-group">
+                        <label for="Lender_portion_Funded">Lender Portion Funded</label>
+                        <input type="number" id="Lender_portion_Funded" name="Lender_portion_Funded" class="readonly-input" readonly value="0.5" step="0.0001">
+                    </div>
+                    <div class="form-group">
+                        <label for="Lender_portion_to_be_repaid">Lender Share to be Repaid (KES)</label>
+                        <input type="number" id="Lender_portion_to_be_repaid" name="Lender_portion_to_be_repaid" placeholder="Amount lender recovers" required value="5500" min="0">
+                    </div>
+                </div>
+                <button type="submit">Run Risk Assessment Engine</button>
+            </form>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="glass-card results-container" id="resultsPanel">
+            <!-- Placeholder State -->
+            <div class="placeholder-state" id="statePlaceholder">
+                <svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
+                </svg>
+                <h3>Engine Standby</h3>
+                <p>Submit the application parameters on the left to initialize scoring.</p>
+            </div>
+
+            <!-- Loading State -->
+            <div class="loading-state" id="stateLoading">
+                <div class="spinner"></div>
+                <h3>Evaluating Default Risk Profile...</h3>
+                <p>Computing engineered attributes, looking up customer history, and running ML inference pipeline.</p>
+            </div>
+
+            <!-- Result State -->
+            <div class="result-state" id="stateResult">
+                <div class="risk-badge" id="riskBadge">LOW RISK</div>
+                <div class="gauge-wrapper">
+                    <svg class="gauge-svg" viewBox="0 0 200 200">
+                        <circle class="gauge-bg" cx="100" cy="100" r="90" />
+                        <circle class="gauge-bar" id="gaugeBar" cx="100" cy="100" r="90" />
+                    </svg>
+                    <div class="gauge-text">
+                        <span class="probability-value" id="probabilityValue">0.0%</span>
+                        <span class="probability-label">Default Prob</span>
+                    </div>
+                </div>
+                <div class="metric-cards">
+                    <div class="metric-card">
+                        <h4>Interest Rate</h4>
+                        <p id="resInterestRate">0.0%</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4>Repayment Ratio</h4>
+                        <p id="resRepayRatio">0.0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2026 QuantumRisk Analytics Engine. Kenya Credit Registry System. Version 2.0.0</p>
+    </footer>
+
+    <script>
+        // Automatic calculations
+        const disbInput = document.getElementById('disbursement_date');
+        const dueInput = document.getElementById('due_date');
+        const durationInput = document.getElementById('duration');
+        const amtInput = document.getElementById('Total_Amount');
+        const fundedInput = document.getElementById('Amount_Funded_By_Lender');
+        const portionInput = document.getElementById('Lender_portion_Funded');
+
+        function updateDuration() {
+            if (disbInput.value && dueInput.value) {
+                const disb = new Date(disbInput.value);
+                const due = new Date(dueInput.value);
+                const diffTime = due - disb;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                durationInput.value = diffDays >= 0 ? diffDays : 0;
+            }
+        }
+
+        function updatePortion() {
+            const amt = parseFloat(amtInput.value) || 0;
+            const funded = parseFloat(fundedInput.value) || 0;
+            if (amt > 0) {
+                portionInput.value = (funded / amt).toFixed(4);
+            } else {
+                portionInput.value = 0;
+            }
+        }
+
+        disbInput.addEventListener('change', updateDuration);
+        dueInput.addEventListener('change', updateDuration);
+        amtInput.addEventListener('input', () => { updatePortion(); });
+        fundedInput.addEventListener('input', () => { updatePortion(); });
+
+        // AJAX Prediction Submit
+        const form = document.getElementById('predictionForm');
+        const statePlaceholder = document.getElementById('statePlaceholder');
+        const stateLoading = document.getElementById('stateLoading');
+        const stateResult = document.getElementById('stateResult');
+        const gaugeBar = document.getElementById('gaugeBar');
+        const probVal = document.getElementById('probabilityValue');
+        const riskBadge = document.getElementById('riskBadge');
+        const resInterestRate = document.getElementById('resInterestRate');
+        const resRepayRatio = document.getElementById('resRepayRatio');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Check if duration or dates are logical
+            if (parseInt(durationInput.value) <= 0) {
+                alert("Error: Due date must be strictly after the disbursement date.");
+                return;
+            }
+            if (parseFloat(fundedInput.value) > parseFloat(amtInput.value)) {
+                alert("Error: Amount funded by lender cannot exceed the total disbursed amount.");
+                return;
+            }
+            if (parseFloat(document.getElementById('Total_Amount_to_Repay').value) < parseFloat(amtInput.value)) {
+                alert("Error: Total amount to repay must be equal to or greater than the disbursed amount.");
+                return;
+            }
+
+            // Show loading
+            statePlaceholder.style.display = 'none';
+            stateResult.style.display = 'none';
+            stateLoading.style.display = 'flex';
+
+            const formData = new FormData(form);
+            const payload = {};
+            formData.forEach((value, key) => {
+                // Parse numeric inputs
+                if (['Total_Amount', 'Total_Amount_to_Repay', 'duration', 'Amount_Funded_By_Lender', 'Lender_portion_Funded', 'Lender_portion_to_be_repaid'].includes(key)) {
+                    payload[key] = parseFloat(value);
+                } else {
+                    payload[key] = value;
+                }
+            });
+
+            // Make it Kenyan country code as required
+            payload['country_id'] = 'Kenya';
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+                stateLoading.style.display = 'none';
+
+                if (response.ok) {
+                    stateResult.style.display = 'flex';
+                    
+                    const prob = data.probability;
+                    const probPct = (prob * 100).toFixed(1);
+                    probVal.innerText = `${probPct}%`;
+
+                    // Animate gauge meter
+                    // r=90, circumference = 565.48
+                    const offset = 565.48 - (prob * 565.48);
+                    gaugeBar.style.strokeDashoffset = offset;
+
+                    if (data.prediction === 1) {
+                        riskBadge.innerText = 'HIGH DEFAULT RISK';
+                        riskBadge.className = 'risk-badge risk-high';
+                        gaugeBar.style.stroke = 'var(--accent-red)';
+                    } else {
+                        riskBadge.innerText = 'LOW DEFAULT RISK';
+                        riskBadge.className = 'risk-badge risk-low';
+                        gaugeBar.style.stroke = 'var(--accent-green)';
+                    }
+
+                    // Interest calculation
+                    const principal = payload['Total_Amount'];
+                    const repay = payload['Total_Amount_to_Repay'];
+                    const interestPct = (((repay - principal) / principal) * 100).toFixed(1);
+                    resInterestRate.innerText = `${interestPct}%`;
+                    resRepayRatio.innerText = (repay / principal).toFixed(2);
+                } else {
+                    statePlaceholder.style.display = 'flex';
+                    alert(`Prediction Error: ${data.error || 'Server returned an invalid response.'}`);
+                }
+            } catch (err) {
+                stateLoading.style.display = 'none';
+                statePlaceholder.style.display = 'flex';
+                alert(`Error connecting to server: ${err.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
