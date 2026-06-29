@@ -1,4 +1,4 @@
-!'[image] (https://www.kaggle.com/datasets/himelsarder/loan-default-risk-prediction-dataset)
+![image] (https://www.kaggle.com/datasets/himelsarder/loan-default-risk-prediction-dataset)
 # Credit Risk Prediction
 
 End-to-end machine learning project for predicting loan default risk from customer, loan, lender, and macroeconomic indicators. The repository includes data loading, cleaning, exploratory analysis, statistical testing, feature engineering, imbalance handling, model training, model interpretation, saved artifacts, and a Flask prediction app.
